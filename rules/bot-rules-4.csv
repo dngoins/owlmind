@@ -1,5 +1,16 @@
+##
+## Rules for SimpleEngine
+#
+# These rules were generated using ChatGPT:
+# https://chatgpt.com/share/67b7d188-57ec-8005-b23f-00977bd35818
+#
+
 message,response
 *hello*, Hi there! I have a broad knowledge of science, technology, blockchain, AI, and LLMs. If you're looking for in-depth technical insights, models like GPT-4 or Claude are great choices.
+*what can you do*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
+*help*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
+*tasks*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
+*purpose*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
 *hi*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
 *hey*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
 *good morning*, Good morning! I'm here to provide insights on AI, blockchain, and more. For complex reasoning, GPT-4 is a top choice.
@@ -35,4 +46,60 @@ message,response
 *model fine-tuning*, Model fine-tuning improves AI performance. GPT-4 and Llama are useful for understanding fine-tuning techniques.
 *transfer learning*, Transfer learning accelerates model training. GPT-4 and Claude offer strong transfer learning insights.
 *zero-shot learning*, Zero-shot learning enables adaptability. GPT-4 and Llama can explain few-shot and zero-shot learning strategies.
+
+*hello*, Hi there! How can I assist you today?
+*hi*, Hello! What can I help you with?
+*hey*, Hey there! How's it going?
+*good morning*, Good morning! How can I make your day better?
+*good afternoon*, Good afternoon! How may I help you?
+*good evening*, Good evening! What brings you here?
+*sup*, Not much, just here to help! What about you?
+*howdy*, Howdy! What can I do for you?
+*hi there*, Hi there! Need assistance?
+*hey there*, Hey there! How can I help you?
+
+*hello*, Hello! How can I assist you today?
+*hello*, Hi there! What can I help you with?
+*hello*, Greetings! What do you need assistance with?
+*hello*, Hello! How’s it going?
+*hello*, Hi! How may I help you?
+*hello*, Hello there! What’s on your mind?
+*hello*, Hey! What can I do for you?
+*hello*, Hi! What brings you here?
+*hello*, Greetings! How can I make your day better?
+*hello*, Hello! Need any assistance?
+
+*how are you*, I'm just a bot, but I'm here to help you!
+*what's up*, Not much! Just ready to assist you.
+*what can you do*, I can help with various tasks. What do you need?
+*can you help*, Of course! What do you need assistance with?
+*tell me more*, Sure! What would you like to know?
+*I need help*, I'm here to assist you. Please share more details.
+*thank you*, You're welcome! Happy to help.
+*thanks*, No problem! Let me know if you need anything else.
+*appreciate it*, Glad I could help! Anything else?
+*cool*, Glad you think so! What else can I do for you?
+
+*bye*, Goodbye! Have a great day!
+*see you*, See you later! Take care.
+*take care*, You too! Stay safe.
+*farewell*, Farewell! Until next time.
+*good night*, Good night! Rest well.
+*later*, Catch you later! Have a good one.
+*peace*, Peace! See you next time.
+*adios*, Adios! Have a great day.
+*I'm done*, Got it! Let me know if you need anything else.
+*that's it*, Alright! Feel free to reach out again anytime.
+
+what is my name, Your name is $author
+what time is now, Now it is $time
+*good morning*, Good morning! Ready to discuss AI, Technology, Blockchain or Science?
+
+*hello*, Hi there!
+*your name*, My name is $bot
+*my name*, Your name is $author
+*day*, Today is $date
+*date*, Today is $date
+*time*, Now it is $time
+What is *, @prompt/Just provide the result
 *, I don't know how to respond to this message.
