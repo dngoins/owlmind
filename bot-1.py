@@ -46,8 +46,8 @@ if __name__ == '__main__':
     # Load Simples Bot Brain loading rules from a CSV
     engine = SimpleEngine(id='bot-1')
     engine.model_provider = provider
-    engine.load('rules/bot-rules-3.csv')
-
+    engine.load('rules/bot-rules-4.csv')
+    
     # Kick start the Bot Runner process
     bot = DiscordBot(token=TOKEN, engine=engine, debug=True)
     bot.run()
