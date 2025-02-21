@@ -97,7 +97,12 @@ class ModelProvider():
         self.req_maker = None
         self.delta = -1
         self.response = None
-
+        self.models = None
+        self.model_names =[]
+        self.eval_model = None
+        self.template_before = ''
+        self.template_after = ''
+        self.prompt = ''
 
         if type == 'ollama':
             self.req_maker = OllamaRequest()
@@ -105,6 +110,17 @@ class ModelProvider():
         elif type == 'open-webui':
             self.req_maker = OpenWebUIRequest()
             self.type = 'open-webui'
+        
+        self.models = self.list_models()
+        self.model_names = [model['id'] for model in self.models]
+    
+        self.eval_model = self.evaluate_models(self.models)
+        self.eval_model = self.eval_model['id']
+        
+        self.template_before = f'You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Only select from the model names: {self.model_names}. Based on the parameter size, {self.eval_model} is the best model, but choose another if its description better matches the prompt. As an agent, you also create LLM prompts for the selected LLM. When you select the LLM provide a detailed explanation of why you selected that LLM. Explain the strengths and weaknesses of the LLM and how it compares to other LLMs.'    
+        
+        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
+        
         return
 
     def _call(self, url, payload=None):
@@ -125,6 +141,54 @@ class ModelProvider():
         
         return delta, response
 
+    def list_models(self):
+                
+        headers = dict()
+        headers["Content-Type"] = "application/json"
+        if self.api_key: headers["Authorization"] = f"Bearer {self.api_key}"
+
+        # Send out request to Model Provider
+        try:
+            response = requests.get(f'{self.base_url}/api/models', headers=headers)
+            models = response.json()
+            models = models["data"]
+            # the models json looks like this: 
+                    
+        except:
+            return -1, f"!!ERROR!! Request failed! You need to adjust prompt-eng/config with URL({url})"
+
+        # Checking the response and extracting the 'response' field
+        if response is None:
+            return -1, f"!!ERROR!! There was no response (?)"
+        elif response.status_code == 200:
+            return models
+    
+    def extractParameterSize(self, parameter_size):
+        if parameter_size.endswith("M"):
+            return float(parameter_size[:-1])
+        elif parameter_size.endswith("B"):
+            return float(parameter_size[:-1]) * 1000
+
+
+    def evaluate_models(self, models):
+        best_model = None
+        best_score = float('-inf')
+        
+        for model in models:
+            description = model['info']['meta']['description']
+            
+            examples = model['info']['meta']['suggestion_prompts']
+            # Example evaluation logic: prioritize models with higher parameter count
+            if 'ollama' in model:
+                score = self.extractParameterSize(model['ollama']['details']['parameter_size'])
+            else:
+                score = 0
+        
+            if score > best_score:
+                best_score = score
+                best_model = model
+        
+        return best_model
 
     def models(self):
         """
@@ -143,7 +207,34 @@ class ModelProvider():
 
         ## (1) Creates the payload through the ModelRequestMaker
         url = self.req_maker.url_chat(self.base_url)
-        payload = self.req_maker.package(model=self.model, prompt=prompt, **kwargs)
+        self.prompt = self.template_before + '\n' + prompt + '\n' + self.template_after
+        payload = self.req_maker.package(model=self.model, prompt=self.prompt, **kwargs)
+        payload = json.dumps(payload) if payload else None
+
+        ## (2) Creates the HTTP-Req
+        delta, response = self._call(url=url, payload=payload)
+        
+        # first remove the 'json' prefix from the response
+        #response = response.replace('json', '')
+
+        # now remove the ``` from the response
+        #response = response.replace('```', '')  
+
+        print('Response->', url, response.json())
+        
+        # extract the Model name from the Json formatted response. The response looks like this 'json{"model": "LLM Name", "prompt": "LLM Prompt"}'
+        if response:
+            try:
+                json_response = json.loads(response.json()['choices'][0]['message']['content'])
+                self.eval_model = json_response['model']
+                self.prompt = json_response['prompt']
+                #self.reason = json_response['reason']
+               
+            except json.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}")
+                print(f"Response content: {response}")
+            
+        payload = self.req_maker.package(model=self.eval_model, prompt=self.prompt, **kwargs)
         payload = json.dumps(payload) if payload else None
 
         print('P->', url, payload)
@@ -151,6 +242,7 @@ class ModelProvider():
         ## (2) Creates the HTTP-Req
         delta, response = self._call(url=url, payload=payload)
 
+        print('\nFinalResponse->\n', url, response.json())
         # (3) Load the results
         if response is None:
             self.delta = -1

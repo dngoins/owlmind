@@ -46,9 +46,7 @@ message,response
 *model fine-tuning*, Model fine-tuning improves AI performance. GPT-4 and Llama are useful for understanding fine-tuning techniques.
 *transfer learning*, Transfer learning accelerates model training. GPT-4 and Claude offer strong transfer learning insights.
 *zero-shot learning*, Zero-shot learning enables adaptability. GPT-4 and Llama can explain few-shot and zero-shot learning strategies.
-
 *hello*, Hi there! How can I assist you today?
-*hi*, Hello! What can I help you with?
 *hey*, Hey there! How's it going?
 *good morning*, Good morning! How can I make your day better?
 *good afternoon*, Good afternoon! How may I help you?
@@ -91,8 +89,8 @@ message,response
 *I'm done*, Got it! Let me know if you need anything else.
 *that's it*, Alright! Feel free to reach out again anytime.
 
-what is my name, Your name is $author
-what time is now, Now it is $time
+*what is my name*, Your name is $author
+*what time is now*, Now it is $time
 *good morning*, Good morning! Ready to discuss AI, Technology, Blockchain or Science?
 
 *hello*, Hi there!
@@ -102,4 +100,4 @@ what time is now, Now it is $time
 *date*, Today is $date
 *time*, Now it is $time
 What is *, @prompt/Just provide the result
-*, I don't know how to respond to this message.
+*, @prompt/Just provide the result
