@@ -44,9 +44,9 @@ if __name__ == '__main__':
     provider = ModelProvider(type=TYPE,  base_url=URL, api_key=API_KEY, model=MODEL) if URL else None
 
     # Load Simples Bot Brain loading rules from a CSV
-    engine = SimpleEngine(id='bot-1')
+    engine = SimpleEngine(id='llm-search')
     engine.model_provider = provider
-    engine.load('rules/bot-rules-4.csv')
+    engine.load('rules/bot-rules-3.csv')
     
     # Kick start the Bot Runner process
     bot = DiscordBot(token=TOKEN, engine=engine, debug=True)

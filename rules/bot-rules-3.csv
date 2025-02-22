@@ -11,4 +11,4 @@ message,response
 *date*, Today is $date
 *time*, Now it is $time
 What is *, @prompt/Just provide the result
-*, @prompt/Act like you are a personal assistant. Process this message
+*, @prompt/You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Select the llm and process this message

@@ -103,6 +103,7 @@ class ModelProvider():
         self.template_before = ''
         self.template_after = ''
         self.prompt = ''
+        self.reason = ''
 
         if type == 'ollama':
             self.req_maker = OllamaRequest()
@@ -119,7 +120,7 @@ class ModelProvider():
         
         self.template_before = f'You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Only select from the model names: {self.model_names}. Based on the parameter size, {self.eval_model} is the best model, but choose another if its description better matches the prompt. As an agent, you also create LLM prompts for the selected LLM. When you select the LLM provide a detailed explanation of why you selected that LLM. Explain the strengths and weaknesses of the LLM and how it compares to other LLMs.'    
         
-        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
+        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. In the returned prompt, make sure to say to limit the response to 1990 characters or less. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
         
         return
 
@@ -227,8 +228,8 @@ class ModelProvider():
             try:
                 json_response = json.loads(response.json()['choices'][0]['message']['content'])
                 self.eval_model = json_response['model']
-                self.prompt = json_response['prompt']
-                #self.reason = json_response['reason']
+                self.prompt = json_response['prompt'] + '\nStrong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
+                self.reason = json_response['reason']
                
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
@@ -241,8 +242,7 @@ class ModelProvider():
 
         ## (2) Creates the HTTP-Req
         delta, response = self._call(url=url, payload=payload)
-
-        print('\nFinalResponse->\n', url, response.json())
+      
         # (3) Load the results
         if response is None:
             self.delta = -1
@@ -252,6 +252,7 @@ class ModelProvider():
             self.delta = -1
             self.response = None
             self.result = response
+            print('\nFinalResponse->\n', url, response)
         elif response.status_code == 401:
             self.delta = -1
             self.response = None
@@ -259,12 +260,18 @@ class ModelProvider():
         elif response.status_code == 200:
             self.delta = round(delta, 3)
             self.response = response.json()
+            print('\nFinalResponse->\n', url, response.json())
             self.result = self.req_maker.unpackage(self.response)
+            
         else: 
             self.delta = -1
             self.response = None
-            self.result = f"!!ERROR!! HTTP Response={response.status_code}, {response.text}"
+            if response.text == '{"detail":"Model not found"}':
+                self.result = f"!!ERROR!! {self.eval_model} not found.\n {self.reason}\nIt's possible this model is not available or loaded in Ollama, sorry."
+            else:
+                self.result = f"!!ERROR!! HTTP Response={response.status_code}, {response.text}"
         
+        print('\nResult->', self.result)
         return self.result 
 
 

@@ -103,7 +103,8 @@ class DiscordBot(discord.Client):
                 reactions       = reactions)
 
         if self.debug: print(f'PROCESSING: ctx={context}')
-                               
+        await message.channel.send("One moment please, I'm processing...")                      
+        
         # Process through engine
         if self.engine:
             self.engine.process(context)
@@ -113,6 +114,13 @@ class DiscordBot(discord.Client):
         if context.response:
             await message.channel.send(context.response)
         return
+
+    async def on_error(event, *args, **kwargs):
+        with open('err.log', 'a') as f:
+            if event == 'on_message':
+                f.write(f'Unhandled message: {args[0]}\n')
+            else:
+                raise
 
     def run(self):
         super().run(self.token)
