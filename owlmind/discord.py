@@ -103,16 +103,18 @@ class DiscordBot(discord.Client):
                 reactions       = reactions)
 
         if self.debug: print(f'PROCESSING: ctx={context}')
-        await message.channel.send("One moment please, I'm processing...")                      
+        await message.channel.send("One moment please, I'm thinking...")                      
         
         # Process through engine
         if self.engine:
             self.engine.process(context)
-
+            await message.channel.send("Processing...")                      
+        
         # If the immediate processing of Context generated a result (sync mode), return it through the bot interface
         # @TODO return attachments, issue reactions, etc
         if context.response:
             await message.channel.send(context.response)
+
         return
 
     async def on_error(event, *args, **kwargs):

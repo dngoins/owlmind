@@ -233,41 +233,77 @@ class ModelProvider():
 
         ## (1) Creates the payload through the ModelRequestMaker
         url = self.req_maker.url_chat(self.base_url)
-        self.prompt = self.template_before + '\n' + prompt + '\n' + self.template_after
+        self.prompt = self.template_before + '\n ' + prompt + '\n ' + self.template_after
         payload = self.req_maker.package(model=self.model, prompt=self.prompt, **kwargs)
         payload = json.dumps(payload) if payload else None
 
         ## (2) Creates the HTTP-Req
         delta, response = self._call(url=url, payload=payload)
         
-        # first remove the 'json' prefix from the response
-        #response = response.replace('json', '')
+        if response is None:
+            self.delta = -1
+            self.response = None
+            self.result = "!!ERROR!! There was no response (?)"
+        elif isinstance(response,str):
+            self.delta = -1
+            self.response = None
+            self.result = response
+            print('String Response->', url, response)
+        elif response.status_code == 401:
+            self.delta = -1
+            self.response = None
+            self.result = f"!!ERROR!! Authentication issue. You need to adjust .env with API_KEY ({self.base_url})"
+        elif response.status_code == 200:
+            self.delta = round(delta, 3)
+            self.response = response.json()
+            print('Initial Json Response->', url, response.json())
+            self.result = self.req_maker.unpackage(self.response)
 
-        # now remove the ``` from the response
-        #response = response.replace('```', '')  
+            # first remove the 'json' prefix from the response
+            #response = response["response"].replace('json', '')
 
-        print('Response->', url, response.json())
-        
-        # extract the Model name from the Json formatted response. The response looks like this 'json{"model": "LLM Name", "prompt": "LLM Prompt"}'
-        if response:
+            # now remove the ``` from the response
+            #response = response.replace('```', '')  
+   
+            # extract the Model name from the Json formatted response. The response looks like this 'json{"model": "LLM Name", "prompt": "LLM Prompt"}'
             try:
-                json_response = json.loads(response.json()['choices'][0]['message']['content'])
-                self.eval_model = json_response['model']
-                self.prompt = json_response['prompt'] + '\nStrong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
-                self.reason = json_response['reason']
-               
+                response = response.json()
+                if 'id' in response:
+                    json_content = response['choices'][0]['message']['content'].replace('json', '').replace('```','')
+                    print('Json Content->', json_content)              
+                    json_response = json.loads(json_content)
+                    self.eval_model = json_response['model']
+                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
+                    self.reason = json_response['reason']
+                    print('Eval Json Response->', url, json_response)
+                else:
+                    json_response = json.loads(response.json()['response'].replace('json', '').replace('```', ''))
+                    self.eval_model = json_response['model']
+                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
+                    self.reason = json_response['reason']
+                    print('Eval Json Response->', url, json_response)
+
+                payload = self.req_maker.package(model=self.eval_model, prompt=self.prompt, **kwargs)
+                payload = json.dumps(payload) if payload else None
+
+                print('P->', url, payload)
+
+                ## (2) Creates the HTTP-Req
+                delta, response = self._call(url=url, payload=payload)
+                
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
-                print(f"Response content: {response}")
-            
-        payload = self.req_maker.package(model=self.eval_model, prompt=self.prompt, **kwargs)
-        payload = json.dumps(payload) if payload else None
-
-        print('P->', url, payload)
-
-        ## (2) Creates the HTTP-Req
-        delta, response = self._call(url=url, payload=payload)
-      
+                print(f"Error Response content: {response}")
+                
+        else: 
+            self.delta = -1
+            self.response = None
+            if response.text == '{"detail":"Model not found"}':
+                self.result = f"!!ERROR!! {self.eval_model} not found.\n {self.reason}\nIt's possible this model is not available or loaded in Ollama, sorry."
+            else:
+                self.result = f"!!ERROR!! HTTP Response={response.status_code}, {response.text}"
+        
+                
         # (3) Load the results
         if response is None:
             self.delta = -1
@@ -277,7 +313,7 @@ class ModelProvider():
             self.delta = -1
             self.response = None
             self.result = response
-            print('\nFinalResponse->\n', url, response)
+            print('String Response->', url, response)
         elif response.status_code == 401:
             self.delta = -1
             self.response = None
@@ -285,7 +321,7 @@ class ModelProvider():
         elif response.status_code == 200:
             self.delta = round(delta, 3)
             self.response = response.json()
-            print('\nFinalResponse->\n', url, response.json())
+            print('Json Response->', url, response.json())
             self.result = self.req_maker.unpackage(self.response)
             
         else: 
@@ -296,7 +332,7 @@ class ModelProvider():
             else:
                 self.result = f"!!ERROR!! HTTP Response={response.status_code}, {response.text}"
         
-        print('\nResult->', self.result)
+        print('Result->', self.result)
         return self.result 
 
 
