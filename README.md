@@ -53,4 +53,4 @@ The ``Agentic Core`` adheres to the ``Belief-Desire-Intention (BDI) framework``,
 * [Configure GenAI Pipelines](./CONFIG.md) to extend the Bot's conversation capabilities
 * Configure Prompt Engineering Workflows to improve the Bot's reasoning.
 * Configure Artifacts in the GenAI Pipelines to extend the Bot's reasoning capabilities
-
+* [Deploy to Azure](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-github-action#configure-github-workflow)
