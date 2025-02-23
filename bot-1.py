@@ -44,6 +44,12 @@ if __name__ == '__main__':
     TYPE = os.getenv('SERVER_TYPE')
     API_KEY = os.getenv('SERVER_API_KEY')
     
+    print(f"TOKEN: {TOKEN}")
+    print(f"URL: {URL}")
+    print(f"MODEL: {MODEL}")
+    print(f"TYPE: {TYPE}")
+    print(f"API_KEY: {API_KEY}")
+    
     # Configure a ModelProvider if there is an URL
     provider = ModelProvider(type=TYPE,  base_url=URL, api_key=API_KEY, model=MODEL) if URL else None
 

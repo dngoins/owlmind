@@ -113,11 +113,22 @@ class ModelProvider():
             self.type = 'open-webui'
         
         self.models = self.list_models()
-        self.model_names = [model['id'] for model in self.models]
-    
+#        print(self.models)
+
+        hasId = False
+        if 'model' in self.models[0]:
+            self.model_names = [model['model'] for model in self.models]
+        else:
+            hasId = True
+            self.model_names = [model['id'] for model in self.models]
+            
         self.eval_model = self.evaluate_models(self.models)
-        self.eval_model = self.eval_model['id']
-        
+
+        if hasId:
+            self.eval_model = self.eval_model['id']
+        else:
+            self.eval_model = self.eval_model['model']
+
         self.template_before = f'You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Only select from the model names: {self.model_names}. Based on the parameter size, {self.eval_model} is the best model, but choose another if its description better matches the prompt. As an agent, you also create LLM prompts for the selected LLM. When you select the LLM provide a detailed explanation of why you selected that LLM. Explain the strengths and weaknesses of the LLM and how it compares to other LLMs.'    
         
         self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. In the returned prompt, make sure to say to limit the response to 1990 characters or less. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
@@ -150,13 +161,23 @@ class ModelProvider():
 
         # Send out request to Model Provider
         try:
-            response = requests.get(f'{self.base_url}/api/models', headers=headers)
+            hasFauedu = False
+            if 'fau.edu' in self.base_url:
+                hasFauedu = True
+                response = requests.get(f'{self.base_url}/api/models', headers=headers)
+            else:
+                response = requests.get(f'{self.base_url}/api/tags', headers=headers)
+            
             models = response.json()
-            models = models["data"]
+            if hasFauedu:
+                models = models["data"]
+            else:
+                models = models["models"]
+            
             # the models json looks like this: 
                     
         except:
-            return -1, f"!!ERROR!! Request failed! You need to adjust prompt-eng/config with URL({url})"
+            return -1, f"!!ERROR!! Request failed! You need to adjust prompt-eng/config with URL({self.base_url})"
 
         # Checking the response and extracting the 'response' field
         if response is None:
@@ -176,12 +197,16 @@ class ModelProvider():
         best_score = float('-inf')
         
         for model in models:
-            description = model['info']['meta']['description']
             
-            examples = model['info']['meta']['suggestion_prompts']
+            if 'info' in model:
+                description = model['info']['meta']['description']
+                examples = model['info']['meta']['suggestion_prompts']
+            
             # Example evaluation logic: prioritize models with higher parameter count
             if 'ollama' in model:
                 score = self.extractParameterSize(model['ollama']['details']['parameter_size'])
+            elif 'details' in model:
+                score = self.extractParameterSize(model['details']['parameter_size'])
             else:
                 score = 0
         
