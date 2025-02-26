@@ -2,99 +2,11 @@
 ## Rules for SimpleEngine
 #
 # These rules were generated using ChatGPT:
-# https://chatgpt.com/share/67b7d188-57ec-8005-b23f-00977bd35818
+# https://chatgpt.com/share/67bf77c0-a414-8005-a8a4-cbcdcbb91ba7 
 #
 
 message,response
-*hello*, Hi there! I have a broad knowledge of science, technology, blockchain, AI, and LLMs. If you're looking for in-depth technical insights, models like GPT-4 or Claude are great choices.
-*what can you do*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
-*help*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
-*tasks*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
-*purpose*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
-*hi*, Hello! I can help answer questions on various topics, from science to AI. If you need detailed explanations, GPT-4 or PaLM might be the best LLMs to use.
-*hey*, Hey! I specialize in answering queries about AI, LLMs, and emerging technologies. Depending on your needs, GPT-4 and Claude excel at detailed responses.
-*good morning*, Good morning! I'm here to provide insights on AI, blockchain, and more. For complex reasoning, GPT-4 is a top choice.
-*good afternoon*, Good afternoon! I can assist with science, technology, and AI. For coding and research, models like GPT-4 or Gemini are highly recommended.
-*good evening*, Good evening! Whether you’re curious about LLMs or technology trends, GPT-4 and Claude are solid choices.
-*science*, Let's explore the world of science. For scientific research, Perplexity AI and GPT-4 provide well-structured information.
-*technology*, Technology is evolving rapidly. If you need up-to-date trends, GPT-4 and Bard are great LLMs to explore.
-*blockchain*, Blockchain is revolutionizing industries. LLMs like GPT-4 and Bard can provide deep insights on smart contracts and decentralization.
-*ai*, AI is transforming the way we live and work. If you need an LLM recommendation, GPT-4 and Claude offer advanced AI insights.
-*llm*, Large language models are advancing quickly. For comparing LLMs, you might use GPT-4, Llama, or Mistral for different perspectives.
-*physics*, Physics helps us understand the universe. For academic-level physics, GPT-4 and Wolfram Alpha work well together.
-*chemistry*, Chemistry explains how substances interact. GPT-4 with scientific plugins can provide the best explanations.
-*biology*, Biology explores living organisms and their functions. LLMs like GPT-4 and Claude are useful for general and advanced topics.
-*computer science*, Computer science drives modern innovation. If you're coding, GPT-4 and Codex are the best choices.
-*data science*, Data science uncovers patterns in information. For statistical analysis, GPT-4, Claude, and specialized ML models work well.
-*machine learning*, Machine learning improves systems automatically. GPT-4 and Bard can guide you through ML concepts.
-*deep learning*, Deep learning powers advanced AI applications. GPT-4 and Gemini are strong for deep learning discussions.
-*neural networks*, Neural networks mimic the human brain. GPT-4 and Llama can provide explanations and code examples.
-*cryptography*, Cryptography secures digital communication. For encryption concepts, GPT-4 and specialized security LLMs are ideal.
-*cybersecurity*, Cybersecurity protects digital assets. GPT-4 and Bard offer insights, but dedicated security LLMs may be better.
-*quantum computing*, Quantum computing promises breakthroughs. GPT-4 and Perplexity AI help with complex quantum mechanics.
-*robotics*, Robotics automates and enhances tasks. GPT-4 and Claude are useful for technical and research-based discussions.
-*autonomous systems*, Autonomous systems operate independently. GPT-4 and Bard can explain AI-driven autonomy.
-*big data*, Big data helps in decision-making. GPT-4 and Claude handle data-driven discussions well.
-*cloud computing*, Cloud computing enables scalable resources. GPT-4 and Bard are useful for cloud-related insights.
-*distributed systems*, Distributed systems improve efficiency. GPT-4 is a good resource for distributed computing concepts.
-*natural language processing*, NLP enables machines to understand text. GPT-4 and Llama are the best LLMs for NLP-related questions.
-*image recognition*, Image recognition identifies patterns in visuals. GPT-4 and Gemini are good for vision-related AI topics.
-*speech recognition*, Speech recognition converts audio to text. GPT-4 and Whisper AI are great for speech-to-text applications.
-*tokenization*, Tokenization is key in NLP and blockchain. GPT-4 and specialized tokenization models provide detailed explanations.
-*smart contracts*, Smart contracts automate agreements. GPT-4 and Bard are best for Ethereum and Solidity discussions.
-*decentralized networks*, Decentralized networks increase security. GPT-4 and blockchain-specific AI models can provide insights.
-*model fine-tuning*, Model fine-tuning improves AI performance. GPT-4 and Llama are useful for understanding fine-tuning techniques.
-*transfer learning*, Transfer learning accelerates model training. GPT-4 and Claude offer strong transfer learning insights.
-*zero-shot learning*, Zero-shot learning enables adaptability. GPT-4 and Llama can explain few-shot and zero-shot learning strategies.
-
-*hello*, Hi there! How can I assist you today?
-*hi*, Hello! What can I help you with?
-*hey*, Hey there! How's it going?
-*good morning*, Good morning! How can I make your day better?
-*good afternoon*, Good afternoon! How may I help you?
-*good evening*, Good evening! What brings you here?
-*sup*, Not much, just here to help! What about you?
-*howdy*, Howdy! What can I do for you?
-*hi there*, Hi there! Need assistance?
-*hey there*, Hey there! How can I help you?
-
-*hello*, Hello! How can I assist you today?
-*hello*, Hi there! What can I help you with?
-*hello*, Greetings! What do you need assistance with?
-*hello*, Hello! How’s it going?
-*hello*, Hi! How may I help you?
-*hello*, Hello there! What’s on your mind?
-*hello*, Hey! What can I do for you?
-*hello*, Hi! What brings you here?
-*hello*, Greetings! How can I make your day better?
-*hello*, Hello! Need any assistance?
-
-*how are you*, I'm just a bot, but I'm here to help you!
-*what's up*, Not much! Just ready to assist you.
-*what can you do*, I can help with various tasks. What do you need?
-*can you help*, Of course! What do you need assistance with?
-*tell me more*, Sure! What would you like to know?
-*I need help*, I'm here to assist you. Please share more details.
-*thank you*, You're welcome! Happy to help.
-*thanks*, No problem! Let me know if you need anything else.
-*appreciate it*, Glad I could help! Anything else?
-*cool*, Glad you think so! What else can I do for you?
-
-*bye*, Goodbye! Have a great day!
-*see you*, See you later! Take care.
-*take care*, You too! Stay safe.
-*farewell*, Farewell! Until next time.
-*good night*, Good night! Rest well.
-*later*, Catch you later! Have a good one.
-*peace*, Peace! See you next time.
-*adios*, Adios! Have a great day.
-*I'm done*, Got it! Let me know if you need anything else.
-*that's it*, Alright! Feel free to reach out again anytime.
-
-what is my name, Your name is $author
-what time is now, Now it is $time
-*good morning*, Good morning! Ready to discuss AI, Technology, Blockchain or Science?
-
+*what can you do*, Hi I'm $bot I can provide assistance with requirements gathering. I will search the LLM Universe and find the best way to gather or document requirements for you. I can look at all existing LLMs and determine which LLM is best to handle your request and even create the prompt for that LLM and query that special LLM for you. Just ask away but remember I'm focused on requirements gathering solicitation and documentation for IT based projects.
 *hello*, Hi there!
 *your name*, My name is $bot
 *my name*, Your name is $author
@@ -102,4 +14,14 @@ what time is now, Now it is $time
 *date*, Today is $date
 *time*, Now it is $time
 What is *, @prompt/Just provide the result
-*, I don't know how to respond to this message.
+*, @prompt/You are an agent that searches for LLMs and selects the best LLM based on its description parameter size speed and knowledge base. Select the llm and process this message
+*functional requirements*, Please provide detailed functional requirements for the project.
+*non-functional requirements*, Could you specify the non-functional requirements, such as performance and security needs?
+*stakeholder interviews*, What key insights were gathered from stakeholder interviews regarding project expectations?
+*use cases*, Describe the primary use cases that illustrate how users will interact with the system.
+*user stories*, Share the user stories that capture the desired features and functionalities.
+*acceptance criteria*, What are the acceptance criteria to validate that the requirements have been met?
+*prototyping sessions*, Summarize the outcomes of recent prototyping sessions and any feedback received.
+*requirement prioritization*, How are the requirements prioritized, and what factors influence their ranking?
+*scope definition*, Define the project scope including in-scope and out-of-scope items.
+*assumptions and constraints*, List any assumptions and constraints that could impact the project requirements.
