@@ -27,7 +27,8 @@ import requests
 import json
 from urllib.parse import urljoin
 import time
-
+import os
+from openai import AzureOpenAI
 
 class ModelRequestMaker():
 
@@ -113,7 +114,7 @@ class ModelProvider():
             self.type = 'open-webui'
         
         self.models = self.list_models()
-#        print(self.models)
+        print(self.models)
 
         hasId = False
         if 'model' in self.models[0]:
@@ -267,7 +268,8 @@ class ModelProvider():
    
             # extract the Model name from the Json formatted response. The response looks like this 'json{"model": "LLM Name", "prompt": "LLM Prompt"}'
             try:
-                response = response.json()
+                response = self.response
+                                
                 if 'id' in response:
                     json_content = response['choices'][0]['message']['content'].replace('json', '').replace('```','')
                     print('Json Content->', json_content)              
@@ -277,7 +279,7 @@ class ModelProvider():
                     self.reason = json_response['reason']
                     print('Eval Json Response->', url, json_response)
                 else:
-                    json_response = json.loads(response.json()['response'].replace('json', '').replace('```', ''))
+                    json_response = json.loads(response['response'].replace('json', '').replace('```', ''))
                     self.eval_model = json_response['model']
                     self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
                     self.reason = json_response['reason']
