@@ -6,7 +6,7 @@
 #
 
 message,response
-*what can you do*, Hi I'm $bot I can provide assistance with requirements gathering. I will search the LLM Universe and find the best way to gather or document requirements for you. I can look at all existing LLMs and determine which LLM is best to handle your request and even create the prompt for that LLM and query that special LLM for you. Just ask away, but remember I'm focused on requirements gathering solicitation and documentation for IT based projects.
+*what can you do*, Hi I'm $bot I can provide assistance with requirements gathering. I will search the LLM Universe and find the best way to gather or document requirements for you. I can look at all existing LLMs and determine which LLM is best to handle your request and even create the prompt for that LLM and query that special LLM for you. Just ask away but remember I'm focused on requirements gathering solicitation and documentation for IT based projects.
 *hello*, Hi there!
 *your name*, My name is $bot
 *my name*, Your name is $author
@@ -16,7 +16,7 @@ message,response
 What is *, @prompt/Just provide the result
 *, @prompt/You are an agent that searches for LLMs and selects the best LLM based on its description parameter size speed and knowledge base. Select the llm and process this message
 *functional requirements*, Please provide detailed functional requirements for the project.
-*non-functional requirements*, Could you specify the non-functional requirements, such as performance and security needs?
+*non-functional requirements*, Could you specify the non-functional requirements such as performance and security needs?
 *stakeholder interviews*, What key insights were gathered from stakeholder interviews regarding project expectations?
 *use cases*, Describe the primary use cases that illustrate how users will interact with the system.
 *user stories*, Share the user stories that capture the desired features and functionalities.
