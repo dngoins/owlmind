@@ -24,27 +24,48 @@
 # Disclaimer: 
 # Generative AI has been used extensively while developing this package.
 # 
-
-from dotenv import dotenv_values
+import os
+from dotenv import load_dotenv, find_dotenv
 from owlmind.pipeline import ModelProvider
 from owlmind.simple import SimpleEngine
 from owlmind.discord import DiscordBot
-
+    
 if __name__ == '__main__':
 
-    # load token from .env
-    config = dotenv_values('.env')
-    TOKEN = config['DISCORD_TOKEN']
-    URL = config['SERVER_URL']
-    MODEL = config['SERVER_MODEL'] if 'SERVER_MODEL' in config else None
-    TYPE = config['SERVER_TYPE'] if 'SERVER_TYPE' in config else None
-    API_KEY = config['SERVER_API_KEY'] if 'SERVER_API_KEY' in config else None
+    # Check if .env file exists and load it
+    dotenv_path = find_dotenv()
+    if dotenv_path:
+        load_dotenv(dotenv_path)
+    
+    # Load environment variables, falling back to os.getenv if not found in .env
+    TOKEN = os.getenv('DISCORD_TOKEN')
+    URL = os.getenv('SERVER_URL')
+    MODEL = os.getenv('SERVER_MODEL')
+    TYPE = os.getenv('SERVER_TYPE')
+    API_KEY = os.getenv('SERVER_API_KEY')
+    
+    #OPENAPI_KEY = os.getenv('AZURE_OPENAI_API_KEY')
+    #OPENAPI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+    #MODEL_NAME=os.getenv('MODULE_DEPLOYMENT_NAME')
+
+    print(f"TOKEN: {TOKEN}")
+    print(f"URL: {URL}")
+    print(f"MODEL: {MODEL}")
+    print(f"TYPE: {TYPE}")
+    print(f"API_KEY: {API_KEY}")
+    
+        
+    # # Send a completion call to generate an answer
+    # print('Sending a test completion job')
+    # start_phrase = 'Write a tagline for an ice cream shop. '
+    # response = openai_client.completions.create(model=deployment_name, prompt=start_phrase, max_tokens=10)
+    # print(start_phrase+response.choices[0].text)
 
     # Configure a ModelProvider if there is an URL
     provider = ModelProvider(type=TYPE,  base_url=URL, api_key=API_KEY, model=MODEL) if URL else None
 
     # Load Simples Bot Brain loading rules from a CSV
-    engine = SimpleEngine(id='bot-1')
+    engine = SimpleEngine(id='llm-search')
     engine.model_provider = provider
     engine.load('rules/bot-rules-4.csv')
     
