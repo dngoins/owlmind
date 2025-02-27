@@ -124,7 +124,8 @@ A prompt is created for the model of choice to ask it to select from the downloa
 
 ![alt text](image-3.png)
 
-Below is the full output of the process:
+
+
 
 ```json
 {
@@ -136,9 +137,9 @@ Below is the full output of the process:
 
 At this point the model has selected the best model for the task and provided an explanation of why the model was selected. The LLM generated prompt is then utilized to query the selected model for the task:
 
-    ```json    
-    P-> https://chat.hpc.fau.edu/api/chat/completions {"model": "Llama-3.2-3B-Instruct", "messages": [{"role": "user", "content": "To gather requirements from a CEO, start by scheduling a flexible meeting, ensuring an agenda is prepared, emphasizing goal alignment and strategic priorities. Ask open-ended questions to explore key business objectives, challenges, and opportunities for innovation. Limit your response to 1900 characters or less.. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement."}]}
-    ```
+```json    
+{"model": "Llama-3.2-3B-Instruct", "messages": [{"role": "user", "content": "To gather requirements from a CEO, start by scheduling a flexible meeting, ensuring an agenda is prepared, emphasizing goal alignment and strategic priorities. Ask open-ended questions to explore key business objectives, challenges, and opportunities for innovation. Limit your response to 1900 characters or less.. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement."}]}
+```
 
 
 The model then generates a response based on the prompt:
@@ -147,13 +148,13 @@ The model then generates a response based on the prompt:
 
 Final Response:
 
-    ```json
-    Json Response-> https://chat.hpc.fau.edu/api/chat/completions {'id': 'chatcmpl-06db799447184d3aa9b8a97138434874', 'created': 1740616501, 'model': 'meta-llama/Llama-3.2-3B-Instruct', 'object': 'chat.completion', 'system_fingerprint': None, 'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': 'To gather requirements from a CEO, schedule a flexible meeting, emphasizing:\n\n1. Goal alignment: Ask, "What are our organization\'s top 3-5 objectives for the next quarter/year?"\n2. Strategic priorities: Ask, "What initiatives are currently driving our growth/revolutionizing our industry?"\n3. Open-ended questions: Ask, "How are we performing against our goals?", "What are the biggest challenges facing our organization?", "What opportunities do you see for innovation?"\n\nThis approach ensures a engaging discussion, identifying key areas for focus and aligning with strategic priorities.', 'role': 'assistant', 'tool_calls': None, 'function_call': None, 'refusal': None, 'reasoning_content': None}}], 'usage': {'completion_tokens': 116, 'prompt_tokens': 110, 'total_tokens': 226, 'completion_tokens_details': None, 'prompt_tokens_details': None}, 'service_tier': None, 'prompt_logprobs': None}
+```json
+{'id': 'chatcmpl-06db799447184d3aa9b8a97138434874', 'created': 1740616501, 'model': 'meta-llama/Llama-3.2-3B-Instruct', 'object': 'chat.completion', 'system_fingerprint': None, 'choices': [{'finish_reason': 'stop', 'index': 0, 'message': {'content': 'To gather requirements from a CEO, schedule a flexible meeting, emphasizing:\n\n1. Goal alignment: Ask, "What are our organization\'s top 3-5 objectives for the next quarter/year?"\n2. Strategic priorities: Ask, "What initiatives are currently driving our growth/revolutionizing our industry?"\n3. Open-ended questions: Ask, "How are we performing against our goals?", "What are the biggest challenges facing our organization?", "What opportunities do you see for innovation?"\n\nThis approach ensures a engaging discussion, identifying key areas for focus and aligning with strategic priorities.', 'role': 'assistant', 'tool_calls': None, 'function_call': None, 'refusal': None, 'reasoning_content': None}}], 'usage': {'completion_tokens': 116, 'prompt_tokens': 110, 'total_tokens': 226, 'completion_tokens_details': None, 'prompt_tokens_details': None}, 'service_tier': None, 'prompt_logprobs': None}
 ```
+
 
 ![alt text](image-4.png)
 
-********
 
 # Performance
 
@@ -166,10 +167,3 @@ The Gen AI system is slower because it has to query the Ollama server to determi
 We could further research the following:
     
 * Utilize different prompting styles to select a diffent model and measure it's speed and accuracy.
-
-# Code References - Examples
-    
-    ```bash
-         PS C:\Users\dngoi\source\repos\github\dngoins\prompt-eng> python .\prompt-eng\_pipeline.py "help me with building a flying car" > Results.txt
-    ``` 
-    
