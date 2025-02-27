@@ -237,6 +237,7 @@ class ModelProvider():
         ## (1) Creates the payload through the ModelRequestMaker
         url = self.req_maker.url_chat(self.base_url)
         self.prompt = self.template_before + '\n ' + prompt + '\n ' + self.template_after
+        print(f'1st Phase Prompt: {self.prompt}')
         payload = self.req_maker.package(model=self.model, prompt=self.prompt, **kwargs)
         payload = json.dumps(payload) if payload else None
 
