@@ -132,7 +132,7 @@ class ModelProvider():
 
         self.template_before = f'You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Only select from the model names: {self.model_names}. Based on the parameter size, {self.eval_model} is the best model, but choose another if its description better matches the prompt. As an agent, you also create LLM prompts for the selected LLM. When you select the LLM provide a detailed explanation of why you selected that LLM. Explain the strengths and weaknesses of the LLM and how it compares to other LLMs.'    
         
-        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. In the returned prompt, make sure to say to limit the response to 1990 characters or less. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
+        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. In the returned prompt, make sure to say to limit the response to 1900 characters or less. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
         
         return
 
@@ -277,13 +277,13 @@ class ModelProvider():
                     print('Json Content->', json_content)              
                     json_response = json.loads(json_content)
                     self.eval_model = json_response['model']
-                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
+                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement.'
                     self.reason = json_response['reason']
                     print('Eval Json Response->', url, json_response)
                 else:
                     json_response = json.loads(response['response'].replace('json', '').replace('```', ''))
                     self.eval_model = json_response['model']
-                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1990 characters. This is a requirement.'
+                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement.'
                     self.reason = json_response['reason']
                     print('Eval Json Response->', url, json_response)
 

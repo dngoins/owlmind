@@ -135,10 +135,10 @@ class SimpleEngine(BotEngine):
                     prompt = prompt + '\n' + context['message']
                     print('E--> requesting:', prompt)
                     strResponse, delta = self.model_provider.request(prompt)
-                    context.response = f'{strResponse[0]}\n\nTotal Time Taken: {delta} ms'
+                    context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'
             else: 
                 strResponse, delta = context.compile(context.result)
-                context.response = f'{strResponse[0][0]}\n\nTotal Time Taken: {delta} ms'
+                context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'
         else:
             context.response = "#### DEFAULT: There are no rules setup for this request!"
         return 
