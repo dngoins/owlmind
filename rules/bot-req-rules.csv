@@ -13,8 +13,8 @@ message,response
 *day*, Today is $date
 *date*, Today is $date
 *time*, Now it is $time
-What is *, @prompt/Just provide the result
-*, @prompt/You are an agent that searches for LLMs and selects the best LLM based on its description parameter size speed and knowledge base. Select the llm and process this message
+*What is *, @prompt/Just provide the result
+*, @prompt/Just provide the result
 *functional requirements*, Please provide detailed functional requirements for the project.
 *non-functional requirements*, Could you specify the non-functional requirements such as performance and security needs?
 *stakeholder interviews*, What key insights were gathered from stakeholder interviews regarding project expectations?

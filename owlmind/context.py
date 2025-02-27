@@ -27,6 +27,7 @@
 
 import re
 import random
+import time
 from collections.abc import Iterable
 
 class Context(dict):
@@ -304,6 +305,8 @@ class Context(dict):
         print(c.compile('The code is ${api/code}'))
         """
         result = ''
+        start_time = time.time()
+        
         if isinstance(sentence, (list, tuple, set)):
             # Recursively process each element of the sequence
             result = type(sentence)(self.compile(element) for element in sentence)
@@ -318,7 +321,9 @@ class Context(dict):
                 return str(value) if isinstance(value, str) else f"<pointer to {value}>"
 
             result = re.sub(pattern, substitute, sentence)
-        return result
+        
+        delta = time.time() - start_time
+        return [result, delta]
 
 ###
 ### CONTEXTUALIZED ELEMENT

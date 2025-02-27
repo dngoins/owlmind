@@ -165,11 +165,13 @@ class ModelProvider():
             hasFauedu = False
             if 'fau.edu' in self.base_url:
                 hasFauedu = True
+                print('Searching FAU domain')
                 response = requests.get(f'{self.base_url}/api/models', headers=headers)
             else:
                 response = requests.get(f'{self.base_url}/api/tags', headers=headers)
             
             models = response.json()
+            print(f'Models: {models}')
             if hasFauedu:
                 models = models["data"]
             else:
@@ -335,7 +337,7 @@ class ModelProvider():
                 self.result = f"!!ERROR!! HTTP Response={response.status_code}, {response.text}"
         
         print('Result->', self.result)
-        return self.result 
+        return self.result, self.delta
 
 
 ##

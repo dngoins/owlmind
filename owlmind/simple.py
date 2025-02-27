@@ -124,6 +124,9 @@ class SimpleEngine(BotEngine):
 
         elif context in self.plans:
             if self.debug: print(f'SimpleEngine: response={context.result}, alternatives={len(context.alternatives)}, score={context.score}')
+
+            context.result = context.result[0]
+            print(f'Context-Result: {context.result}')
             if self.is_action(context.result):
                 command, prompt = context.result.split('/', maxsplit=1) if '/' in context.result else (context.result, '')
                 print('-->', command, prompt, context['message'])
@@ -131,10 +134,11 @@ class SimpleEngine(BotEngine):
                 if command == '@prompt' and self.model_provider:
                     prompt = prompt + '\n' + context['message']
                     print('E--> requesting:', prompt)
-                    context.response = self.model_provider.request(prompt)
-                    
+                    strResponse, delta = self.model_provider.request(prompt)
+                    context.response = f'{strResponse[0]}\n\nTotal Time Taken: {delta} ms'
             else: 
-                context.response = context.compile(context.result)
+                strResponse, delta = context.compile(context.result)
+                context.response = f'{strResponse[0][0]}\n\nTotal Time Taken: {delta} ms'
         else:
             context.response = "#### DEFAULT: There are no rules setup for this request!"
         return 
