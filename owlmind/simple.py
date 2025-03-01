@@ -24,7 +24,8 @@
 
 import csv
 from .agent import Plan
-from .bot import BotEngine, BotMessage
+from .bot import BotEngine,  BotMessage
+from discord.ext import commands
 
 class SimpleEngine(BotEngine):
     """
@@ -44,8 +45,13 @@ class SimpleEngine(BotEngine):
         super().__init__(id)
         self.rule_file = None
         self.model_provider = None
+        self.discord_bot = None
+        self.conversations = {}  # Store conversations per channel
         return 
 
+    def set_discord_bot(self, bot):
+        self.discord_bot = bot
+        
     def load(self, file_name):
         """
         Load plans from a CSV file.
@@ -88,11 +94,11 @@ class SimpleEngine(BotEngine):
         self.announcement = f'SimpleEngine {self.id} loaded {row_count} Rules from {file_name}.'
         return 
 
-    def process(self, context:BotMessage):
+    async def process(self, context:BotMessage):
         """
         Simplified deliberation logic.
         """
-
+        
         if context['message'] == '/help':
             context.response = f'### Version: {BotMessage.VERSION}\n'
             context.response += f'### Help\n'
@@ -106,6 +112,8 @@ class SimpleEngine(BotEngine):
                 context.response += f'### Model Provider:\n'
                 context.response += f'* type: {self.model_provider.type}\n'
                 context.response += f'* url: {self.model_provider.base_url}\n'
+                context.response += f'* Registered commands: {[command.name for command in self.discord_bot.commands]}\n'
+
 
             context.response += f'### PlanRepo: \n'
             context.response += f'* Number of plans: {len(self.plans)}\n'
@@ -121,7 +129,7 @@ class SimpleEngine(BotEngine):
                 context.response += f'### Loading: {self.rule_file}\n'
                 self.load(file_name=self.rule_file)
             context.response += f'### Reloaded with {len(self.plans)} plans!'
-
+       
         elif context in self.plans:
             if self.debug: print(f'SimpleEngine: response={context.result}, alternatives={len(context.alternatives)}, score={context.score}')
 
@@ -132,16 +140,35 @@ class SimpleEngine(BotEngine):
                 print('-->', command, prompt, context['message'])
                 
                 if command == '@prompt' and self.model_provider:
-                    prompt = prompt + '\n' + context['message']
-                    print('E--> requesting:', prompt)
-                    strResponse, delta = self.model_provider.request(prompt)
+                    self.model_provider.set_context(context)
+                    # Create a unique conversation key for this channel/thread
+                    conv_key = f"{context['layer1']}:{context['layer2']}:{context['layer3']}"
+                    
+                    prompt = prompt + " " + context['message']
+                    print('E--> requesting:', prompt)                    
+                    
+                    # Use chat_request with the conversation history
+                    strResponse, delta = await self.model_provider.chat_request(prompt)
                     context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'
+                elif command == '@getLLMs' and self.model_provider:
+                    self.model_provider.set_context(context)
+                    # get the list of models registered in Ollama
+                    models = self.model_provider.list_models()
+                    
+                    model_names =[]
+                    if 'model' in models[0]:
+                        model_names = [model['model'] for model in models]
+                    else:
+                        model_names = [model['id'] for model in models]
+                    
+                    context.response = f'Models Currently Supported:\n{model_names}\n'
+
+
             else: 
                 strResponse, delta = context.compile(context.result)
                 context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'
         else:
             context.response = "#### DEFAULT: There are no rules setup for this request!"
-        return 
-
+        return
 
 

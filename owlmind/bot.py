@@ -25,6 +25,8 @@
 
 from .agent import Agent, Plan
 from .context import Context
+import discord
+from discord.ext import commands
 
 ##
 ## BASE CLASS FOR BOT MESSAGE

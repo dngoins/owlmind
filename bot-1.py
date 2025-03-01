@@ -24,11 +24,18 @@
 # Disclaimer: 
 # Generative AI has been used extensively while developing this package.
 # 
+## docker command on linux
+## docker image pull registry.hpc.fau.edu/dgoins2019/prompt-eng
+## docker run --env-file .env registry.hpc.fau.edu/dgoins2019/prompt-eng
+
+
 import os
 from dotenv import load_dotenv, find_dotenv
 from owlmind.pipeline import ModelProvider
 from owlmind.simple import SimpleEngine
 from owlmind.discord import DiscordBot
+import asyncio
+
     
 if __name__ == '__main__':
 
@@ -96,5 +103,7 @@ if __name__ == '__main__':
     
     # Kick start the Bot Runner process
     bot = DiscordBot(token=TOKEN, engine=engine, debug=True)
+    engine.set_discord_bot(bot)
+
     bot.run()
 

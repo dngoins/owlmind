@@ -28,7 +28,10 @@ import json
 from urllib.parse import urljoin
 import time
 import os
-from openai import AzureOpenAI
+import discord
+from discord.ext import commands
+import random
+
 
 class ModelRequestMaker():
 
@@ -50,15 +53,20 @@ class OllamaRequest(ModelRequestMaker):
         return urljoin(url, '/api/generate')
     
     def package(self, model, prompt, **kwargs):
+        messages = []
+        if 'history' in kwargs:
+            context = "\n".join([f"{'User: ' if msg['role'] == 'user' else 'Assistant: '}{msg['content']}" 
+                               for msg in kwargs['history']])
+            prompt = f"{context}\nUser: {prompt}\nAssistant:"
+        
         payload = {
-            "model": model, 
-            "prompt": prompt, 
+            "model": model,
+            "prompt": prompt,
             "stream": False,
         }
-
-        # Load kwargs into payload.options
+        
         if kwargs:
-            payload["options"] = {key: value for key, value in kwargs.items()}
+            payload["options"] = {k: v for k, v in kwargs.items() if k != 'history'}
         return payload
     
     def unpackage(self, response):
@@ -70,15 +78,19 @@ class OpenWebUIRequest(ModelRequestMaker):
         return urljoin(url, '/api/chat/completions')
     
     def package(self, model, prompt, **kwargs):
+        messages = []
+        
+        # Add history if it exists
+        if 'history' in kwargs:
+            messages.extend(kwargs['history'])
+        
+        # Add the current message
+        messages.append({"role": "user", "content": prompt})
+        
         payload = {
-            "model": model if model else self.model, 
-            "messages": [ {"role" : "user", "content": prompt } ]
+            "model": model if model else self.model,
+            "messages": messages
         }
-
-        # @NOTE: Need to find out the right syntax to load the arguments here!
-        #kwargs = {key: value for key, value in self.__dict__}
-        #if kwargs:
-        #   payload["options"] = {key: value for key, value in kwargs.items()}
         return payload
     
     def unpackage(self, response):
@@ -101,10 +113,12 @@ class ModelProvider():
         self.models = None
         self.model_names =[]
         self.eval_model = None
+        self.context = None
         self.template_before = ''
         self.template_after = ''
         self.prompt = ''
         self.reason = ''
+        self.session_history = []
 
         if type == 'ollama':
             self.req_maker = OllamaRequest()
@@ -114,7 +128,7 @@ class ModelProvider():
             self.type = 'open-webui'
         
         self.models = self.list_models()
-        print(self.models)
+        #print(self.models)
 
         hasId = False
         if 'model' in self.models[0]:
@@ -132,18 +146,30 @@ class ModelProvider():
 
         self.template_before = f'You are an agent that searches for LLMs and selects the best LLM based on its description, parameter size, speed, and knowledge base. Only select from the model names: {self.model_names}. Based on the parameter size, {self.eval_model} is the best model, but choose another if its description better matches the prompt. As an agent, you also create LLM prompts for the selected LLM. When you select the LLM provide a detailed explanation of why you selected that LLM. Explain the strengths and weaknesses of the LLM and how it compares to other LLMs.'    
         
-        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. In the returned prompt, make sure to say to limit the response to 1900 characters or less. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
+        self.template_after = 'Only return the name of the LLM and corresponding prompt, nothing else, no metadata, no header, no comments, no dashes, ONLY THE LLM Name and PROMPT. Use the following format: {"model": "GPT-4:latest", "prompt": "LLM Prompt", "reason": "GPT uses a fast and efficient model that is able to generate text quickly and accurately on the most widely used topics dealing with science"}'
         
         return
+
+    def set_context(self, context):
+        self.context = context
+        return
+     
+    def set_headers(self):
+        headers = dict()
+        headers["Content-Type"] = "application/json"
+        headers["Accept"] = "application/json"
+        headers["Origin"] = "*"
+        if self.api_key: 
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        
+        return headers
+    
 
     def _call(self, url, payload=None):
         """
         Issue the HTTP-Request to the Model Provider
         """
-        headers = dict()
-        headers["Content-Type"] = "application/json"
-        if self.api_key: 
-            headers["Authorization"] = f"Bearer {self.api_key}"
+        headers = self.set_headers()
         
         try:
             start_time = time.time()
@@ -155,10 +181,10 @@ class ModelProvider():
         return delta, response
 
     def list_models(self):
-                
-        headers = dict()
-        headers["Content-Type"] = "application/json"
-        if self.api_key: headers["Authorization"] = f"Bearer {self.api_key}"
+
+        start_time = time.time()
+                   
+        headers = self.set_headers()
 
         # Send out request to Model Provider
         try:
@@ -171,13 +197,14 @@ class ModelProvider():
                 response = requests.get(f'{self.base_url}/api/tags', headers=headers)
             
             models = response.json()
-            print(f'Models: {models}')
+            #print(f'Models: {models}')
             if hasFauedu:
                 models = models["data"]
             else:
                 models = models["models"]
             
             # the models json looks like this: 
+            delta = time.time() - start_time
                     
         except:
             return -1, f"!!ERROR!! Request failed! You need to adjust prompt-eng/config with URL({self.base_url})"
@@ -223,11 +250,11 @@ class ModelProvider():
         """
         Issue request about Models Available
         """
-        url = self.req_maker.url_models(base_url=self.url)
+        url = self.req_maker.url_models(base_url=self.base_url)
         return self._call(url=url)
 
-
-    def request(self, prompt, **kwargs):
+    
+    async def request(self, prompt, **kwargs):
         """
         Execute the logic for request/response to a Model Provider.
         Creates the payload, issues the Request to the target Model provider.
@@ -236,11 +263,42 @@ class ModelProvider():
 
         ## (1) Creates the payload through the ModelRequestMaker
         url = self.req_maker.url_chat(self.base_url)
-        self.prompt = self.template_before + '\n ' + prompt + '\n ' + self.template_after
-        print(f'1st Phase Prompt: {self.prompt}')
+
+        if not ("!" in self.prompt):
+            self.prompt = self.template_before + '\n ' + prompt + '\n ' + self.template_after
+        
+        # get a random number based on the number of bots
+        number_of_bots = len(self.context["bots"])
+        
+        # Add this where you have number_of_bots defined
+        random_bot_index = random.randint(-10, number_of_bots - 1)
+        if random_bot_index < 0:
+            random_bot = None
+        else:
+            random_bot = self.context["bots"][random_bot_index]        
+
+        # for bot in self.context["bots"]:
+        #     if bot.activity:
+        #         bot_descriptions.append(f"BotName: {bot.name} - Activity: {bot.activity.name}\n")        
+        #     else:
+        #         bot_descriptions.append(f"BotName: {bot.name} - Activity: none\n")        
+        
+        # print(f'Bots in Context: {bot_descriptions}')
+        if (random_bot_index >= 0):
+            print(f'Asking a random bot first: {random_bot.name}')
+            await self.context["discord_context"].channel.send(f"I think {random_bot.name} can help me. Let me ask them first.")
+
+            if random_bot.status != discord.Status.offline:
+                await self.context["discord_context"].channel.send(f'<@{random_bot.id}> Can you help me? Please {prompt}')
+            else:
+                await self.context["discord_context"].channel.send(f'{random_bot.name} just went offline... sorry.')
+        
+        print(f'**** 1st Phase Prompt: {self.prompt}')
         payload = self.req_maker.package(model=self.model, prompt=self.prompt, **kwargs)
         payload = json.dumps(payload) if payload else None
 
+        await self.context["discord_context"].channel.send("\nIn the mean time I'll start looking thru LLMs, one moment please...")
+        
         ## (2) Creates the HTTP-Req
         delta, response = self._call(url=url, payload=payload)
         
@@ -278,13 +336,13 @@ class ModelProvider():
                     print('Json Content->', json_content)              
                     json_response = json.loads(json_content)
                     self.eval_model = json_response['model']
-                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement.'
+                    self.prompt = json_response['prompt'] 
                     self.reason = json_response['reason']
                     print('Eval Json Response->', url, json_response)
                 else:
                     json_response = json.loads(response['response'].replace('json', '').replace('```', ''))
                     self.eval_model = json_response['model']
-                    self.prompt = json_response['prompt'] + '. Strong Emphasis: Limit the response to less than 1900 characters. This is a requirement.'
+                    self.prompt = json_response['prompt'] 
                     self.reason = json_response['reason']
                     print('Eval Json Response->', url, json_response)
 
@@ -317,8 +375,13 @@ class ModelProvider():
         elif isinstance(response,str):
             self.delta = -1
             self.response = None
-            self.result = response
+            self.result = response + f" Model used: {self.eval_model}"
             print('String Response->', url, response)
+        elif isinstance(response, dict):
+            self.delta = round(delta, 3)
+            self.response = response
+            print('Json Response->', url, response)
+            self.result = self.req_maker.unpackage(self.response) + f" Model used: {self.eval_model}"            
         elif response.status_code == 401:
             self.delta = -1
             self.response = None
@@ -327,7 +390,7 @@ class ModelProvider():
             self.delta = round(delta, 3)
             self.response = response.json()
             print('Json Response->', url, response.json())
-            self.result = self.req_maker.unpackage(self.response)
+            self.result = self.req_maker.unpackage(self.response) + f" Model used: {self.eval_model}"
             
         else: 
             self.delta = -1
@@ -339,6 +402,37 @@ class ModelProvider():
         
         print('Result->', self.result)
         return self.result, self.delta
+
+    def add_to_history(self, role, content):
+        self.session_history.append({
+            "role": role,
+            "content": content
+        })
+
+    async def chat_request(self, prompt, **kwargs):
+        """
+        Execute a chat request that maintains conversation history
+        """
+        # Add the user's prompt to history
+        self.add_to_history("user", prompt)
+        
+        # Include history in the request
+        kwargs['history'] = self.session_history
+        
+        result, delta = await self.request(prompt, **kwargs)
+        
+        # Add the assistant's response to history
+        if result and not result.startswith("!!ERROR!!"):
+            self.add_to_history("assistant", result)
+        
+        return result, delta
+
+    def reset_session(self):
+        """
+        Resets the conversation history to start a new chat session
+        """
+        self.session_history = []
+
 
 
 ##
@@ -357,5 +451,17 @@ if __name__ == '__main__':
 
     # Configure a ModelProvider if there is an URL
     provider = ModelProvider(type=TYPE,  base_url=URL, api_key=API_KEY, model=MODEL) if URL else None
-    print(provider.request(prompt="1+1"))
+    #print(provider.request(prompt="1+1"))
+
+    # Initialize the provider
+    #provider = ModelProvider(type=TYPE, base_url=URL, api_key=API_KEY, model=MODEL)
+
+    # First message
+    #result, delta = provider.chat_request("What is Python?")
+
+    # Follow-up message (will include context from previous exchange)
+    #result, delta = provider.chat_request("What are its main features?")
+
+    # You can access the conversation history
+    #print(provider.session_history)
 

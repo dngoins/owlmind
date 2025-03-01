@@ -25,3 +25,6 @@ message,response
 *requirement prioritization*, How are the requirements prioritized, and what factors influence their ranking?
 *scope definition*, Define the project scope including in-scope and out-of-scope items.
 *assumptions and constraints*, List any assumptions and constraints that could impact the project requirements.
+*which LLMs*, @getLLMs
+*what LLMs*, @getLLMs
+*what models*, @getLLMs
