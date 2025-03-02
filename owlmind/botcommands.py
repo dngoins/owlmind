@@ -15,16 +15,22 @@ class BotCommands(commands.Cog):
             print("list bots")
             # Get all members in the server
             bots = [member for member in ctx.guild.members if member.bot]
-            users = [member for member in ctx.guild.members if not member.bot]
+            # users = [member for member in ctx.guild.members if not member.bot]
 
+            # if member.bot and member.status != discord.Status.offline 
             # Format the response
             response = f"Bots ({len(bots)}):\n"
             for bot in bots:
                 #response += f"- {bot.name}\n"
+                # 🤖💡🔋⚡
+                response += f"🤖"
+                if bot.status == discord.Status.online:
+                    response += "💡"
+
                 if bot.activity:
-                    response += f"🤖 {bot.name} (ID: {bot.id}) - {bot.activity.name}\n"
+                    response += f"⚡{bot.name} (ID: {bot.id}) - status: {bot.status} - {bot.activity.name}\n"
                 else:
-                    response += f"🤖 {bot.name} (ID: {bot.id}) - no activity\n" 
+                    response += f"{bot.name} (ID: {bot.id}) - status: {bot.status} - no activity\n" 
         
             # Split message if it's too long
             if len(response) > 1900:

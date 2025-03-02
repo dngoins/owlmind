@@ -28,3 +28,4 @@ message,response
 *which LLMs*, @getLLMs
 *what LLMs*, @getLLMs
 *what models*, @getLLMs
+*ask bot*, @askBot

@@ -98,6 +98,8 @@ class SimpleEngine(BotEngine):
         """
         Simplified deliberation logic.
         """
+        context.response = ""
+        discord_context = context['discord_context']
         
         if context['message'] == '/help':
             context.response = f'### Version: {BotMessage.VERSION}\n'
@@ -163,7 +165,26 @@ class SimpleEngine(BotEngine):
                     
                     context.response = f'Models Currently Supported:\n{model_names}\n'
 
+                elif command == '@askBot' and self.model_provider:
+                    
+                    self.model_provider.set_context(context)
+                    #prompt = prompt + " " + context['message']
+                   
+                    # Get mentioned users from the discord context
+                    mentions = discord_context.mentions
+                    for mention in mentions:
+                        # First mentioned user/bot will be the target
+                        mentioned_bot = mention
+                        # Update the prompt with the mentioned bot's info
+                        if mentioned_bot.name != self.discord_bot.user.name:
+                            prompt += f"@{mentioned_bot.name} "
+                    prompt +=  context['message']
 
+
+                    strResponse, delta = await self.model_provider.ask_bot(prompt)
+                    print(f'Bot Response: {strResponse}, Time: {delta}')
+                    context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'
+                    
             else: 
                 strResponse, delta = context.compile(context.result)
                 context.response = f'{strResponse}\n\nTotal Time Taken: {delta} ms'

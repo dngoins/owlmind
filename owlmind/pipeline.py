@@ -403,6 +403,64 @@ class ModelProvider():
         print('Result->', self.result)
         return self.result, self.delta
 
+    async def ask_bot(self, prompt, **kwargs):
+        """
+        Execute the logic for request/response to a Model Provider.
+        Creates the payload, issues the Request to the target Model provider.
+        Unpackage the response, it any
+        """
+
+        start_time = time.time()
+      
+        ## (1) Creates the payload through the ModelRequestMaker
+        url = self.req_maker.url_chat(self.base_url)
+
+        self.prompt = prompt
+        
+        author = self.context["discord_context"].author
+
+        #botName can be found in prompt it is prefixed with @
+        #extract botName from prompt
+        botName = prompt.split('@')[1].split(' ')[0]
+        
+        # if botName empty choose a random online bot
+        if botName == '':
+            # get a random number based on the number of bots
+            number_of_bots = len(self.context["bots"])
+
+            # Add this where you have number_of_bots defined
+            random_bot_index = random.randint(0, number_of_bots - 1)
+        
+            if random_bot_index < 0:
+                random_bot = None
+            else:
+                random_bot = self.context["bots"][random_bot_index]        
+        else: # find bot name in list of online bots
+            for bot in self.context["bots"]:
+                if bot.name == botName:
+                    random_bot = bot
+                    break
+            else:
+                random_bot = None
+            
+        if random_bot is not None:
+            author_name = author.name
+            await self.context["discord_context"].channel.send(f"Ok {author_name}, let's see if {random_bot.name} can help me. Let me ask them first what you asked.")
+
+            if random_bot.status != discord.Status.offline:
+                await self.context["discord_context"].channel.send(f'<@{random_bot.id}> Can you help me with this request from <@{author.id}>: {prompt}')
+        else:
+            author_name = author.name
+            await self.context["discord_context"].channel.send(f'I am so sorry <@{author.id}>, either this bot is offline, or I just can not find it. You can try again with another Bot.')
+        
+        result = "Ok, I have tried to ask the bot. Please wait for their response."
+        delta = time.time() - start_time
+    
+        return result, delta
+    
+        
+      
+
     def add_to_history(self, role, content):
         self.session_history.append({
             "role": role,

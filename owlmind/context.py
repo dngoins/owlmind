@@ -51,7 +51,7 @@ class Context(dict):
         print(test.subs)
     """
 
-    VERSION = "1.3"
+    VERSION = "1.4"
 
     _ = '_'
     MAX_CLAUSE = 100.0
